@@ -12,7 +12,7 @@ using System.Linq;
 //**********    ICD API allows programmatic access to the International Classification of Diseases(ICD). 
 //**********    More Information on ICD API and getting access to it 
 //**********
-//**********    https://icdaccessmanagement.who.int
+//**********    https://icd.who.int/icdapi
 //**********
 //**********
 //********************************************************************************************************************************
@@ -87,7 +87,7 @@ namespace Sample1
             Console.WriteLine("****************************************************************");
             Console.WriteLine("Enter a search term:");
             var term = Console.ReadLine();
-            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/beta/morbidity/search?q="+term);
+            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/beta/mms/search?q="+term);
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
