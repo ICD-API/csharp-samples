@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample1", "Sample1\Sample1.csproj", "{1CD44A87-008C-4BA5-B56F-D8F26E90D817}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleNetCore", "Sample1\SampleNetCore.csproj", "{1CD44A87-008C-4BA5-B56F-D8F26E90D817}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleNetFramework", "SampleNetFramework\SampleNetFramework.csproj", "{90B5AC75-556D-4D7E-A4C9-D33DF5F1D3C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{1CD44A87-008C-4BA5-B56F-D8F26E90D817}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CD44A87-008C-4BA5-B56F-D8F26E90D817}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CD44A87-008C-4BA5-B56F-D8F26E90D817}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90B5AC75-556D-4D7E-A4C9-D33DF5F1D3C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90B5AC75-556D-4D7E-A4C9-D33DF5F1D3C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90B5AC75-556D-4D7E-A4C9-D33DF5F1D3C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90B5AC75-556D-4D7E-A4C9-D33DF5F1D3C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
