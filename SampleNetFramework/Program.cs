@@ -87,6 +87,7 @@ namespace Sample1
             var prettyJson = JValue.Parse(resultJson).ToString(Formatting.Indented); //convert json to a more human readable fashion
             Console.WriteLine(prettyJson);
 
+            Console.WriteLine("Press a key to contiue");
             Console.ReadKey();//Wait until a key is pressed
 
             Console.WriteLine("****************************************************************");
@@ -120,7 +121,7 @@ namespace Sample1
             {
                 Console.WriteLine(de.TheCode + " " + de.Title);
             }
-
+            Console.WriteLine("Press a key to end the program");
             Console.ReadKey(); //Wait until a key is pressed
 
         }
