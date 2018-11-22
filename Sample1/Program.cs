@@ -28,26 +28,31 @@ namespace Sample1
             Sample1().GetAwaiter().GetResult();
         }
 
-        static async Task  Sample1()
+        static async Task Sample1()
         {
-            DiscoveryResponse disco =
-                    await DiscoveryClient.GetAsync("https://icdaccessmanagement.who.int");
-
-            TokenClient tokenClient;
-
-            var lines = File.ReadLines(_secureFile).ToArray(); 
-            if (lines.Count()!=2)
+            var lines = File.ReadLines(_secureFile).ToArray();
+            if (lines.Count() != 2)
             {
                 Console.WriteLine("the securefile should have two lines in it. The first line contains the client id and the second line client key");
                 return;
             }
 
             var clientId = lines[0];
-            var clientKey = lines[1];
-            tokenClient = new TokenClient(disco.TokenEndpoint, clientId,clientKey);
+            var clientSecret = lines[1];
 
-            TokenResponse tokenResponse;
-            tokenResponse = await tokenClient.RequestClientCredentialsAsync("icdapi_access");
+            var client = new HttpClient();
+            var disco = await client.GetDiscoveryDocumentAsync("https://icdaccessmanagement.who.int");
+            if (disco.IsError) throw new Exception(disco.Error);
+
+            var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                Scope = "icdapi_access",
+                GrantType = "client_credentials",
+                ClientCredentialStyle=ClientCredentialStyle.AuthorizationHeader
+            });
 
             if (tokenResponse.IsError)
             {
@@ -59,7 +64,7 @@ namespace Sample1
             Console.WriteLine("\n\n");
 
             // call api
-            var client = new HttpClient();
+            client = new HttpClient();
             client.SetBearerToken(tokenResponse.AccessToken);
 
             HttpRequestMessage request;
@@ -87,7 +92,7 @@ namespace Sample1
             Console.WriteLine("****************************************************************");
             Console.WriteLine("Enter a search term:");
             var term = Console.ReadLine();
-            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/beta/mms/search?q="+term);
+            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/beta/mms/search?q=" + term);
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
@@ -109,11 +114,11 @@ namespace Sample1
             //Now trying to parse and get titles from the search result
 
             Console.WriteLine("****** ICD code and titles from the search *****");
-            dynamic searchResult = JsonConvert.DeserializeObject(resultJson); 
+            dynamic searchResult = JsonConvert.DeserializeObject(resultJson);
 
             foreach (var de in searchResult.DestinationEntities)
             {
-                Console.WriteLine(de.TheCode +" "+ de.Title);
+                Console.WriteLine(de.TheCode + " " + de.Title);
             }
 
             Console.ReadKey(); //Wait until a key is pressed
