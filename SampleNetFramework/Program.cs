@@ -77,6 +77,7 @@ namespace Sample1
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+            request.Headers.Add("API-Version", "v2");
             var response = await client.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
@@ -97,6 +98,7 @@ namespace Sample1
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+            request.Headers.Add("API-Version", "v2");
             response = await client.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
