@@ -23,9 +23,9 @@ namespace Sample1
         //The _secureFile is a text file with two lines in it. The first line contains the client id and the second line client key
         static string _secureFile = @"c:\users\can\securefile.txt";
 
-        static void Main(string[] args)
+        public static async Task Main()
         {
-            Sample1().GetAwaiter().GetResult();
+            await Sample1();
         }
 
         static async Task Sample1()
@@ -94,7 +94,7 @@ namespace Sample1
             Console.WriteLine("****************************************************************");
             Console.WriteLine("Enter a search term:");
             var term = Console.ReadLine();
-            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/beta/mms/search?q=" + term);
+            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/2021-05/mms/search?q=" + term);
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
@@ -119,9 +119,11 @@ namespace Sample1
             Console.WriteLine("****** ICD code and titles from the search *****");
             dynamic searchResult = JsonConvert.DeserializeObject(resultJson);
 
-            foreach (var de in searchResult.DestinationEntities)
+            var des = searchResult.destinationEntities;
+
+            foreach (var de in searchResult.destinationEntities)
             {
-                Console.WriteLine(de.TheCode + " " + de.Title);
+                Console.WriteLine(de.theCode + " " + de.title);
             }
             Console.WriteLine("Press a key to end the program");
             Console.ReadKey(); //Wait until a key is pressed

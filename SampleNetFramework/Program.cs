@@ -94,7 +94,7 @@ namespace Sample1
             Console.WriteLine("****************************************************************");
             Console.WriteLine("Enter a search term:");
             var term = Console.ReadLine();
-            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/beta/mms/search?q=" + term);
+            request = new HttpRequestMessage(HttpMethod.Get, "https://id.who.int/icd/release/11/2021-05/mms/search?q=" + term);
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
@@ -119,9 +119,9 @@ namespace Sample1
             Console.WriteLine("****** ICD code and titles from the search *****");
             dynamic searchResult = JsonConvert.DeserializeObject(resultJson);
 
-            foreach (var de in searchResult.DestinationEntities)
+            foreach (var de in searchResult.destinationEntities)
             {
-                Console.WriteLine(de.TheCode + " " + de.Title);
+                Console.WriteLine(de.theCode + " " + de.title);
             }
             Console.WriteLine("Press a key to end the program");
             Console.ReadKey(); //Wait until a key is pressed
