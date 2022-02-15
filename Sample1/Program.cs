@@ -21,7 +21,7 @@ namespace Sample1
     class Program
     {
         //The _secureFile is a text file with two lines in it. The first line contains the client id and the second line client key
-        static string _secureFile = @"c:\users\can\securefile.txt";
+        static string _secureFile = @"c:\users\someuser\securefile.txt";
 
         public static async Task Main()
         {
@@ -41,8 +41,12 @@ namespace Sample1
             var clientSecret = lines[1];
 
             var client = new HttpClient();
+
+            //Instead of the following two lines you could directly use the token endpoint as https://icdaccessmanagement.who.int/connect/token
             var disco = await client.GetDiscoveryDocumentAsync("https://icdaccessmanagement.who.int");
             if (disco.IsError) throw new Exception(disco.Error);
+
+
 
             var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
