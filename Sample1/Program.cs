@@ -91,6 +91,7 @@ namespace Sample1
                 Console.WriteLine(response.StatusCode);
             }
 
+
             var resultJson = response.Content.ReadAsStringAsync().Result;
             var prettyJson = JValue.Parse(resultJson).ToString(Formatting.Indented); //convert json to a more human readable fashion
             Console.WriteLine(prettyJson);
