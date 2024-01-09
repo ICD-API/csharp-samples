@@ -20,10 +20,12 @@ namespace Sample1
 {
     class Program
     {
-        //The _secureFile is a text file with two lines in it. The first line contains the client id and the second line client key
-        static string _secureFile = @"c:\users\someuser\securefile.txt";
+		//The _secureFile is a text file with two lines in it. The first line contains the client id and the second line client key
+		//static string _secureFile =   @"c:\users\someuser\securefile.txt";
+		// read lines from securefile.txt using relative path to the project
+		static string _secureFile = @"..\..\..\securefile.txt";		
 
-        public static async Task Main()
+		public static async Task Main()
         {
             await Sample1();
         }
@@ -61,7 +63,8 @@ namespace Sample1
             if (tokenResponse.IsError)
             {
                 Console.WriteLine(tokenResponse.Error);
-                return;
+				Console.ReadKey(); //Wait until a key is pressed
+				return;
             }
 
             Console.WriteLine(tokenResponse.Json);

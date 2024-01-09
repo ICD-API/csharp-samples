@@ -1,0 +1,3132 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ICD-API",
+    "description": "\n<p>\nICD-API is a REST API that allows programmatic access to the International Classification of Diseases (ICD).\n</p><p>\nFor most users that require accessing the ICD-11 statistical classification with codes, you need to use the <b>Linearization</b> endpoints with the linearizationId set to <b>mms</b>\n</p><p>\n<b>Foundation</b> endpoints provide information on the Foundation Component of ICD-11. \n</p><p>\n<b>ICD10</b> endpoints serves ICD-10 releases. Please note that functionality on the ICD-10 endpoints are limited. (i.e. the search is not provided)\n</p><p>\nFor more information on the API please see the <a href=\"https://icd.who.int/icdapi\">ICD-API home page </a>\n</p>\n",
+    "license": {
+      "name": " ICD-11 Terms of Use and License Agreement ",
+      "url": "https://icd.who.int/en/docs/icd11-license.pdf"
+    },
+    "version": "v2.3.0"
+  },
+  "paths": {
+    "/icd/entity": {
+      "get": {
+        "tags": [
+          "Foundation"
+        ],
+        "summary": "This endpoint returns basic information on the latest release of the ICD-11 Foundation together with the top level Foundation entities.",
+        "operationId": "GetFoundation",
+        "parameters": [
+          {
+            "name": "releaseId",
+            "in": "query",
+            "description": "This is an optional parameter and if ignored, the API will return values from the latest released version of the Foundation.\r\n            If provided, the API will respond using that particular release. The values are like 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopLevel"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopLevel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/icd/entity/{id}": {
+      "get": {
+        "tags": [
+          "Foundation"
+        ],
+        "summary": "This endpoint provides you information on a specific ICD-11 foundation entity",
+        "operationId": "GetFoundationEntity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Numeric part at the end of the URI for an entity",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "query",
+            "description": "This is an optional parameter and if ignored, the API will return values from the latest released version of the Foundation.\r\n            If provided, the API will respond using that particular release. The values are like 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Some property values such as ancestor and decendant lists are not provided in the response by default. However, it is possible\r\n            to request them. For example, if you set include=ancestor the returned response will include all ancestor entity URIs for the requested entity.\r\n            A comma separated list could be used to request multiple optional property values. (e.g. include=ancestor,descendant",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FoundationEntity"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FoundationEntity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/entity/search": {
+      "get": {
+        "tags": [
+          "Foundation"
+        ],
+        "summary": "This endpoint is for searching the foundation component of the ICD-11. The search can be customized using the parameters as described. Search endpoint accepts both GET and POST requests. If the size of the request is too large, you may need to use POST\r\nas HTTP GET has a size limit of 2K",
+        "operationId": "SearchFoundation",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Text to be searched. Having the character % at the end will be regarded as a wild card for that word",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subtreesFilter",
+            "in": "query",
+            "description": "Optional parameter. Comma separated list of URIs. If provided, the search will be performed on the entities provided and their descendants",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterFilter",
+            "in": "query",
+            "description": "Optional, comma or semicolon separated list of chapter codes eg:01;02;21 When provided, the search will be performed only on these chapters",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "useFlexisearch",
+            "in": "query",
+            "description": "Changes the search mode to flexible search.\r\n            - In the regular search mode, the Coding Tool will only give you results that contain all of the words that you've used in your search. It accepts different variants or \r\n            synonyms of the words but essentially it searches for a result that contains all components of your search. Whereas in flexible search mode, the results do not have to \r\n            contain all of the words that are typed. It would still try to find the best matching phrase but there may be words in your search that are not matched at all\r\n            - It is recommended to use flexible search only when regular search does not provide a result",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "flatResults",
+            "in": "query",
+            "description": "Optional parameter. Default value false. If set to true the search result entities are provided in a nested data structure\r\n            representing the ICD-11 hierarchy. Otherwise they are listed as flat list of matches",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "propertiesToBeSearched",
+            "in": "query",
+            "description": "The properties to be searched. By default the system searches, Title, Synonyms and FullySpecifiedName.\r\n            The valid values that could be used are: \"Title\", \"Synonym\", \"NarrowerTerm\", \"FullySpecifiedName\", \"Definition\" and \"Exclusion\"\r\n            More than one property could be used with \",\" as the separator. In this case the results will include matches from any one of these properties",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "query",
+            "description": "This is an optional parameter and if ignored, the API will return values from the latest released version of the Foundation.\r\n            If provided, the API will respond using that particular release. The values are like 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "highlightingEnabled",
+            "in": "query",
+            "description": "Optional. Default is true, if set to false the search result highlighting is turned off\r\n            and the results don't contain special tags for highlighting where the results are found within the text",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ISearchResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Foundation"
+        ],
+        "summary": "This endpoint is for searching the foundation component of the ICD-11. The search can be customized using the parameters as described. Search endpoint accepts both GET and POST requests. If the size of the request is too large, you may need to use POST\r\nas HTTP GET has a size limit of 2K",
+        "operationId": "SearchFoundation",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Text to be searched. Having the character % at the end will be regarded as a wild card for that word",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subtreesFilter",
+            "in": "query",
+            "description": "Optional parameter. Comma separated list of URIs. If provided, the search will be performed on the entities provided and their descendants",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chapterFilter",
+            "in": "query",
+            "description": "Optional, comma or semicolon separated list of chapter codes eg:01;02;21 When provided, the search will be performed only on these chapters",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "useFlexisearch",
+            "in": "query",
+            "description": "Changes the search mode to flexible search.\r\n            - In the regular search mode, the Coding Tool will only give you results that contain all of the words that you've used in your search. It accepts different variants or \r\n            synonyms of the words but essentially it searches for a result that contains all components of your search. Whereas in flexible search mode, the results do not have to \r\n            contain all of the words that are typed. It would still try to find the best matching phrase but there may be words in your search that are not matched at all\r\n            - It is recommended to use flexible search only when regular search does not provide a result",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "flatResults",
+            "in": "query",
+            "description": "Optional parameter. Default value false. If set to true the search result entities are provided in a nested data structure\r\n            representing the ICD-11 hierarchy. Otherwise they are listed as flat list of matches",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "propertiesToBeSearched",
+            "in": "query",
+            "description": "The properties to be searched. By default the system searches, Title, Synonyms and FullySpecifiedName.\r\n            The valid values that could be used are: \"Title\", \"Synonym\", \"NarrowerTerm\", \"FullySpecifiedName\", \"Definition\" and \"Exclusion\"\r\n            More than one property could be used with \",\" as the separator. In this case the results will include matches from any one of these properties",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "query",
+            "description": "This is an optional parameter and if ignored, the API will return values from the latest released version of the Foundation.\r\n            If provided, the API will respond using that particular release. The values are like 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "highlightingEnabled",
+            "in": "query",
+            "description": "Optional. Default is true, if set to false the search result highlighting is turned off\r\n            and the results don't contain special tags for highlighting where the results are found within the text",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ISearchResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/icd/release/10": {
+      "get": {
+        "tags": [
+          "ICD10"
+        ],
+        "summary": "Lists the available ICD-10 releases",
+        "operationId": "GetICD10Releases",
+        "parameters": [
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/icd/release/10/{releaseId}": {
+      "get": {
+        "tags": [
+          "ICD10"
+        ],
+        "summary": "This endpoint returns basic information on the released version of ICD-10 together with the chapters in it",
+        "operationId": "GetICD10Release",
+        "parameters": [
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. For ICD-10, this is generally the year e.g. 2016",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopLevel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/10/{code}": {
+      "get": {
+        "tags": [
+          "ICD10"
+        ],
+        "summary": "Lists the available ICD-10 releases for the requested category",
+        "operationId": "GetAvailableReleasesForICD10Entity",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "description": "ICD-10 category code. For blocks the code range",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/10/{releaseId}/{code}": {
+      "get": {
+        "tags": [
+          "ICD10"
+        ],
+        "summary": "This endpoint returns  information on the category together with its children categories",
+        "operationId": "GetICD10Entity",
+        "parameters": [
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. For ICD-10, this is generally the year e.g. 2016",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "description": "ICD-10 category code. For blocks the code range",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ICD10Entity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{linearizationname}": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint returns basic information on the linearization such as MMS together with the list of \r\navailable releases",
+        "operationId": "GetReleasesForLinerization",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{releaseId}/{linearizationname}": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint returns basic information on the released linearization (such as MMS) together with the chapters in it",
+        "operationId": "GetLinearization",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. This is generally formatted like this: 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopLevel"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopLevel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{linearizationname}/{id}": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint returns lists the URIs of the entity in the available releases",
+        "operationId": "GetAvailableReleasesForLinearizationEntity",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Numeric part at the end of the URI for an entity",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{linearizationname}/{id}/{residual}": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint returns the list of the URIs of the residual entity in the available releases.",
+        "operationId": "GetAvailableReleasesForLinearizationResidualEntity",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Numeric part at the end of the URI for an entity.  For residual categories this number is the same as its parent but the residual categories also have other or unspecified at the end",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "residual",
+            "in": "path",
+            "description": "For residual categories:\r\n            - this could be 'other' for other specified residual category\r\n            - or 'unspecified' for the unspecified residual category",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiVersion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{releaseId}/{linearizationname}/{id}": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint return information on a linearization entity",
+        "operationId": "GetLinearizationEntity",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. This is generally formatted like this: 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Numeric part at the end of the URI for an entity",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Some property values such as ancestor and decendant lists are not provided in the response by default. However, it is possible\r\n            to request them. For example, if you set include=ancestor the returned response will include all ancestor entity URIs for the requested entity.\r\n            A comma separated list could be used to request multiple optional property values. (e.g. include=ancestor,descendant",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinearizationEntity"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinearizationEntity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{releaseId}/{linearizationname}/{id}/{residual}": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint return information on a residual linearization entity",
+        "operationId": "GetLinearizationResidualEntity",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. This is generally formatted like this: 2019-04",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Numeric part at the end of the URI for an entity. For residual categories this number is the same as its parent but the residual categories also have other or unspecified at the end",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "residual",
+            "in": "path",
+            "description": "For residual categories:\r\n            - this could be 'other' for other specified residual category\r\n            - or 'unspecified' for the unspecified residual category",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Some property values such as ancestor and decendant lists are not provided in the response by default. However, it is possible\r\n            to request them. For example, if you set include=ancestor the returned response will include all ancestor entity URIs for the requested entity.\r\n            A comma separated list could be used to request multiple optional property values. (e.g. include=ancestor,descendant",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinearizationEntity"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinearizationEntity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{releaseId}/{linearizationname}/codeinfo/{code}": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint allows looking up an entity from its code. For postcoordinated code combinations, it provides \r\nmore information on the code combination such as which axes are used and what values do they have",
+        "operationId": "GetCodeInfo",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. This is generally formatted like this: 2021-05. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "description": "The code or code combination that will be looked up. (The & and / characters need to be URL encoded)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "flexiblemode",
+            "in": "query",
+            "description": "Normally, codeInfo returns an error when the provided code combination includes codes that are not in the predefined value sets of the entity.\r\n            If the flexibleMode is set to true, it will return a result even when some of the postcoordination values are not in the defined value sets. In this case the codes that are not matched are\r\n            placed under otherPostcoordination rubric",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeInfo"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{releaseId}/{linearizationname}/lookup": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint allows looking up a foundation entity within a linearization and returns where that entity is coded in this linearization.",
+        "description": "<br>If the foundation entity is included in the linearization and has a code then that linearization entity is returned. \r\n            If the foundation entity in included in the linearization but it is a grouping without a code then the system will return the unspecified \r\n            residual category under that grouping. \r\n            \r\n<br>If the entity is not included in the linearization then the system checks where that entity is aggregated to and then\r\n            returns that entity. \r\n            ",
+        "operationId": "Lookup",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. This is generally formatted like this: 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "foundationUri",
+            "in": "query",
+            "description": "The uri of the foundation entity that you'd like to map to this linearization",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinearizationEntity"
+                }
+              },
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinearizationEntity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{releaseId}/{linearizationname}/search": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint is for searching the linearization (such as MMS). The search can be customized using the parameters as described\r\nSearch endpoint accepts both GET and POST requests. If the size of the request is too large, you may need to use POST\r\nas HTTP GET has a size limit of 2K",
+        "operationId": "SearchLinearization",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. This is generally formatted like this: 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Text to be searched. Having the character % at the end will be regarded as a wild card for that word",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subtreesFilter",
+            "in": "query",
+            "description": "Optional parameter. Comma separated list of URIs. If provided, the search will be performed on the entities provided and their descendants",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subtreeFilterUsesFoundationDescendants",
+            "in": "query",
+            "description": "When a subtree filter is used the search looks at the linearization descendants of the entities in the subtreefilter.\r\n            If subtreeFilterUsesFoundationDescendants is set to true, the search looks at the foundation descendants of the entities in the subtreefilter",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "includeKeywordResult",
+            "in": "query",
+            "description": "Optional parameter. Default false. \r\n            If set to true, the search result will also include keyword list \r\n            - if the last word provided is incomplete, keyword list includes all words that start with the incomplete word (word completion mode)\r\n            - if the last word is complete, the keyword list will provide suggested additional words that could be added to the search query. (word suggestion mode)\r\n            The behavior can be seen in the 1st column of the ICD-11 Coding Tool search results",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "chapterFilter",
+            "in": "query",
+            "description": "Optional, comma or semicolon separated list of chapter codes eg:01;02;21 When provided, the search will be performed only on these chapters",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "useFlexisearch",
+            "in": "query",
+            "description": "Changes the search mode to flexible search.\r\n            - In the regular search mode, the Coding Tool will only give you results that contain all of the words that you've used in your search. It accepts different variants or \r\n            synonyms of the words but essentially it searches for a result that contains all components of your search. Whereas in flexible search mode, the results do not have to \r\n            contain all of the words that are typed. It would still try to find the best matching phrase but there may be words in your search that are not matched at all\r\n            - It is recommended to use flexible search only when regular search does not provide a result",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "flatResults",
+            "in": "query",
+            "description": "Optional parameter. Default value false. If set to true the search result entities are provided in a nested data structure\r\n            representing the ICD-11 hierarchy. Otherwise they are listed as flat list of matches",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "highlightingEnabled",
+            "in": "query",
+            "description": "Optional. Default is true, if set to false the search result highlighting is turned off\r\n            and the results don't contain special tags for highlighting where the results are found within the text",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "medicalCodingMode",
+            "in": "query",
+            "description": "This mode is the default and it should be used when searching the classification for medical coding purposes. \r\n            In this mode, the search gives results from the entities that have a code. In this mode, the system will search all index terms of an entity.\r\n            i.e. titles, synonyms, fully specified term, all terms of other entities that are in the foundation and aggregated into this entity",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "propertiesToBeSearched",
+            "in": "query",
+            "description": "The properties to be included in the search. Used only when medicalCodingMode=false.\r\n            For example, if you'd like to search the definitions, then you need to set medicalCodingMode=false and propertiesToBeSearched=Definition \r\n            The valid values that could be used are: \"Title\", \"FullySpecifiedName\", \"Definition\" and \"Exclusion\"\r\n            More than one property could be used with \",\" as the separator. In this case the results will include matches from any one of these properties",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ISearchResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "This endpoint is for searching the linearization (such as MMS). The search can be customized using the parameters as described\r\nSearch endpoint accepts both GET and POST requests. If the size of the request is too large, you may need to use POST\r\nas HTTP GET has a size limit of 2K",
+        "operationId": "SearchLinearization",
+        "parameters": [
+          {
+            "name": "linearizationname",
+            "in": "path",
+            "description": "Short name for the linearization. e.g. mms for ICD Mortality and Morbidity Statistics",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the release. This is generally formatted like this: 2019-04. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Text to be searched. Having the character % at the end will be regarded as a wild card for that word",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subtreesFilter",
+            "in": "query",
+            "description": "Optional parameter. Comma separated list of URIs. If provided, the search will be performed on the entities provided and their descendants",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subtreeFilterUsesFoundationDescendants",
+            "in": "query",
+            "description": "When a subtree filter is used the search looks at the linearization descendants of the entities in the subtreefilter.\r\n            If subtreeFilterUsesFoundationDescendants is set to true, the search looks at the foundation descendants of the entities in the subtreefilter",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "includeKeywordResult",
+            "in": "query",
+            "description": "Optional parameter. Default false. \r\n            If set to true, the search result will also include keyword list \r\n            - if the last word provided is incomplete, keyword list includes all words that start with the incomplete word (word completion mode)\r\n            - if the last word is complete, the keyword list will provide suggested additional words that could be added to the search query. (word suggestion mode)\r\n            The behavior can be seen in the 1st column of the ICD-11 Coding Tool search results",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "chapterFilter",
+            "in": "query",
+            "description": "Optional, comma or semicolon separated list of chapter codes eg:01;02;21 When provided, the search will be performed only on these chapters",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "useFlexisearch",
+            "in": "query",
+            "description": "Changes the search mode to flexible search.\r\n            - In the regular search mode, the Coding Tool will only give you results that contain all of the words that you've used in your search. It accepts different variants or \r\n            synonyms of the words but essentially it searches for a result that contains all components of your search. Whereas in flexible search mode, the results do not have to \r\n            contain all of the words that are typed. It would still try to find the best matching phrase but there may be words in your search that are not matched at all\r\n            - It is recommended to use flexible search only when regular search does not provide a result",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "flatResults",
+            "in": "query",
+            "description": "Optional parameter. Default value false. If set to true the search result entities are provided in a nested data structure\r\n            representing the ICD-11 hierarchy. Otherwise they are listed as flat list of matches",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "highlightingEnabled",
+            "in": "query",
+            "description": "Optional. Default is true, if set to false the search result highlighting is turned off\r\n            and the results don't contain special tags for highlighting where the results are found within the text",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "medicalCodingMode",
+            "in": "query",
+            "description": "This mode is the default and it should be used when searching the classification for medical coding purposes. \r\n            In this mode, the search gives results from the entities that have a code. In this mode, the system will search all index terms of an entity.\r\n            i.e. titles, synonyms, fully specified term, all terms of other entities that are in the foundation and aggregated into this entity",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "propertiesToBeSearched",
+            "in": "query",
+            "description": "The properties to be included in the search. Used only when medicalCodingMode=false.\r\n            For example, if you'd like to search the definitions, then you need to set medicalCodingMode=false and propertiesToBeSearched=Definition \r\n            The valid values that could be used are: \"Title\", \"FullySpecifiedName\", \"Definition\" and \"Exclusion\"\r\n            More than one property could be used with \",\" as the separator. In this case the results will include matches from any one of these properties",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ISearchResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/icd/release/11/{releaseId}/doris": {
+      "get": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "IMPORTANT!. This endpoint is pre-release. The results may have issues and the API may change in the next releases.\r\nUnderlying cause of death detection using the rules of the Doris system (https://icd.who.int/doris)   \r\nThe fields provided are fields of a standard death certificate.",
+        "description": "<strong>IMPORTANT! This endpoint is pre-release.</strong> The results may have issues and the API may change in the next releases.",
+        "operationId": "UnderlyingCauseOfDeathDetection",
+        "parameters": [
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the ICD release. This is generally formatted like this: 2022-02. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sex",
+            "in": "query",
+            "description": "1:Male, 2:Female, 9:Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "estimatedAge",
+            "in": "query",
+            "description": "Provided in ISO_8601 format https://en.wikipedia.org/wiki/ISO_8601#Durations.\r\n            E.g. P10YD 10 years, P9M 9 months, P5D 5 days, PT10H 10 hours, PT10M 10 minutes",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeA",
+            "in": "query",
+            "description": "Cause field A. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeB",
+            "in": "query",
+            "description": "Cause field B. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeC",
+            "in": "query",
+            "description": "Cause field C. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeD",
+            "in": "query",
+            "description": "Cause field D. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeE",
+            "in": "query",
+            "description": "Cause field E. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodePart2",
+            "in": "query",
+            "description": "Cause field Part2. Classification codes comma separated. It is allowed to use post coordination",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalA",
+            "in": "query",
+            "description": "Time interval from onset to death for Field A.  Provided in ISO_8601 format https://en.wikipedia.org/wiki/ISO_8601#Durations.\r\n            E.g. P10YD 10 years, P9M 9 months, P5D 5 days, PT10H 10 hours, PT10M 10 minutes",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalB",
+            "in": "query",
+            "description": "Time interval from onset to death for Field B. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalC",
+            "in": "query",
+            "description": "Time interval from onset to death for Field C. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalD",
+            "in": "query",
+            "description": "Time interval from onset to death for Field D. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalE",
+            "in": "query",
+            "description": "Time interval from onset to death for Field E. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateBirth",
+            "in": "query",
+            "description": "The date field used in the certificate is using the format defined in the W3C (https://www.w3.org/TR/NOTE-datetime)",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "dateDeath",
+            "in": "query",
+            "description": "The date field used in the certificate is using the format defined in the W3C (https://www.w3.org/TR/NOTE-datetime)",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "maternalDeathWasPregnant",
+            "in": "query",
+            "description": "For women, was the deceased pregnant  0: No, - 1: Yes, - 9: Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maternalDeathPregnancyContribute",
+            "in": "query",
+            "description": "Did pregnancy contribute to death   0: No, - 1: Yes, - 9: Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "timeFromPregnancy",
+            "in": "query",
+            "description": "Please specify the time from pregnancy  0:At the time of death - 1: Within 42 days before death - 2: Between 43 days up to 1 year before death - 9:Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnderlyingCauseOfDeath"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Linearization"
+        ],
+        "summary": "IMPORTANT!. This endpoint is pre-release. The results may have issues and the API may change in the next releases.\r\nUnderlying cause of death detection using the rules of the Doris system (https://icd.who.int/doris)   \r\nThe fields provided are fields of a standard death certificate.",
+        "description": "<strong>IMPORTANT! This endpoint is pre-release.</strong> The results may have issues and the API may change in the next releases.",
+        "operationId": "UnderlyingCauseOfDeathDetection",
+        "parameters": [
+          {
+            "name": "releaseId",
+            "in": "path",
+            "description": "The id for the ICD release. This is generally formatted like this: 2022-02. All releases are listed at https://icd.who.int/icdapi/docs2/SupportedClassifications",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sex",
+            "in": "query",
+            "description": "1:Male, 2:Female, 9:Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "estimatedAge",
+            "in": "query",
+            "description": "Provided in ISO_8601 format https://en.wikipedia.org/wiki/ISO_8601#Durations.\r\n            E.g. P10YD 10 years, P9M 9 months, P5D 5 days, PT10H 10 hours, PT10M 10 minutes",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeA",
+            "in": "query",
+            "description": "Cause field A. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeB",
+            "in": "query",
+            "description": "Cause field B. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeC",
+            "in": "query",
+            "description": "Cause field C. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeD",
+            "in": "query",
+            "description": "Cause field D. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodeE",
+            "in": "query",
+            "description": "Cause field E. Classification codes comma separated. Post coordinated codes can be used",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "causeOfDeathCodePart2",
+            "in": "query",
+            "description": "Cause field Part2. Classification codes comma separated. It is allowed to use post coordination",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalA",
+            "in": "query",
+            "description": "Time interval from onset to death for Field A.  Provided in ISO_8601 format https://en.wikipedia.org/wiki/ISO_8601#Durations.\r\n            E.g. P10YD 10 years, P9M 9 months, P5D 5 days, PT10H 10 hours, PT10M 10 minutes",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalB",
+            "in": "query",
+            "description": "Time interval from onset to death for Field B. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalC",
+            "in": "query",
+            "description": "Time interval from onset to death for Field C. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalD",
+            "in": "query",
+            "description": "Time interval from onset to death for Field D. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "intervalE",
+            "in": "query",
+            "description": "Time interval from onset to death for Field E. Format same as IntervalA",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateBirth",
+            "in": "query",
+            "description": "The date field used in the certificate is using the format defined in the W3C (https://www.w3.org/TR/NOTE-datetime)",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "dateDeath",
+            "in": "query",
+            "description": "The date field used in the certificate is using the format defined in the W3C (https://www.w3.org/TR/NOTE-datetime)",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "maternalDeathWasPregnant",
+            "in": "query",
+            "description": "For women, was the deceased pregnant  0: No, - 1: Yes, - 9: Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maternalDeathPregnancyContribute",
+            "in": "query",
+            "description": "Did pregnancy contribute to death   0: No, - 1: Yes, - 9: Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "timeFromPregnancy",
+            "in": "query",
+            "description": "Please specify the time from pregnancy  0:At the time of death - 1: Within 42 days before death - 2: Between 43 days up to 1 year before death - 9:Unknown",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "description": "Version of the API. Values are like v1,v2.\n For example, if you provide value v2, the API will respond in the format of the version 2 of the API",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "ICD-API is multi-lingual. By changing this header, you may make the API respond in different languages\nLanguages will be available as the translations of ICD-11 completes. \nThe values are language codes such as en, es, zh, etc.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnderlyingCauseOfDeath"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CodeInfo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code as it is queried",
+            "nullable": true
+          },
+          "stemCode": {
+            "type": "string",
+            "description": "Code of the stem. i.e. the first code that is postcoordinated",
+            "nullable": true
+          },
+          "stemId": {
+            "type": "string",
+            "description": "Id of the stem.",
+            "nullable": true
+          },
+          "simplifiedCode": {
+            "type": "string",
+            "description": "In some cases the requested postcoordination combination may be simplified. In these cases, the simplifiedCode field contains\r\nthe code after simplification.",
+            "nullable": true
+          },
+          "simplifiedStemCode": {
+            "type": "string",
+            "description": "In some cases the requested postcoordination combination may be simplified. In these cases, the simplifiedStemCode field contains\r\nthe stem code after simplification.",
+            "nullable": true
+          },
+          "activityWhenInjured": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "alcoholUseInInjury": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "aspectsOfArmedConflict": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "aspectsOfAssaultAndMaltreatment": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "aspectsOfIntentionalSelfHarm": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "associatedWith": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "causality": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "chemicalAgent": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "contextOfAssaultAndMaltreatment": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "counterpart": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "course": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "diagnosisConfirmedBy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "distribution": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "durationOfComa": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "extentOfBurnByBodySurface": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "extentOfFullThicknessBurnByBodySurface": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "fractureOpenOrClosed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "fractureSubtype": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "genderOfPerpetrator": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "genomicAndChomosomalAnomaly": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasAction": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasCausingCondition": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasGCSEyeScore": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasGCSMotorScore": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasGCSVerbalScore": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasManifestation": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasMeans": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasPupilReactionScore": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasSeverity": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasAlternativeSeverity1": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasAlternativeSeverity2": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "hasTarget": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "histopathology": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "infectiousAgent": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "jointInvolvementInFracture": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "laterality": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "mechanismOfInjury": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "mechanismOfTransportInjuryWithoutCounterpart": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "medication": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "modeOfTransportOfTheInjuredPerson": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "objectOrSubstanceProducingInjury": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "occupationalDescriptor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "outcomeOfFullThicknessBurn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "perpetratorVictimRelationship": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "placeOfOccurrence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "psychoactiveDrugUseInInjury": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "regional": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "relational": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "roleOfInjuredPersonInArmedConflict": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "roleOfTheInjuredPerson": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "serotype": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "specificAnatomy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "sportsActivityDescriptor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "temporalPatternAndOnset": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "timeInLife": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "transportEventDescriptor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "typeOfArmedConflict": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "typeOfInjury": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "typeOfLegalIntervention": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "This class is used when an ICD-11 linearization queried with a code or a postcoordination code cluster\r\nIt provides information on the entities referred in the code string"
+      },
+      "EntityTypeEnum": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "description": "(0) Real: real entity in the linearization / foundation <br />\r\n(1) UnderShoreLineLogicallyDefined: Entity in the foundation that can be represented as a post-coordination combination in the linearization <br />\r\n(2) PostCoordinationCombination: does not exist in the foundation but can be represented as post-coordination combination",
+        "format": "int32"
+      },
+      "FoundationEntity": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "longDefinition": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "fullySpecifiedName": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "diagnosticCriteria": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "child": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of URIs for the child entities",
+            "nullable": true
+          },
+          "parent": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of URIs for the parent entities",
+            "nullable": true
+          },
+          "ancestor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of ancestors. Provided only with include=ancestor",
+            "nullable": true
+          },
+          "descendant": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of descendants. Provided only with include=descendant",
+            "nullable": true
+          },
+          "synonym": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of synonyms for this entity",
+            "nullable": true
+          },
+          "narrowerTerm": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of narrower terms for this entity",
+            "nullable": true
+          },
+          "inclusion": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of inclusions for this entity",
+            "nullable": true
+          },
+          "exclusion": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of exclusions for this entity",
+            "nullable": true
+          },
+          "browserUrl": {
+            "type": "string",
+            "description": "ICD Browser is a web site that allows users see the ICD in its hierarchical structure at the same time providing search and post-coordination features.\r\nBrowser URL property provides a direct link to the classification in the WHO's on-line ICD Browser.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Class representing a foundation entity"
+      },
+      "GuessTypeEnum": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "GuessWord": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "dontChangeResult": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a keyword returned as a as a word completion suggestion or as a next word suggestion"
+      },
+      "ICD10Entity": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "longDefinition": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "fullySpecifiedName": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "source": {
+            "type": "string",
+            "description": "URI of the foundation entity that this entity is derived from",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "description": "Code for the ICD-11 category",
+            "nullable": true
+          },
+          "note": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "codingHint": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "classKind": {
+            "type": "string",
+            "description": "Class kind for the category. It could be one of the following\r\n- chapter : if the entity is a chapter. (i.e. at the top level of the classification\r\n- block : huger level entity which don't have codes\r\n- category : An ICD entity that bears a code",
+            "nullable": true
+          },
+          "child": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of URIs for the child entities",
+            "nullable": true
+          },
+          "parent": {
+            "type": "string",
+            "description": "List of URIs for the parent entity",
+            "nullable": true
+          },
+          "indexTerm": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "ICD-11 Index terms are generated from the terms (titles, inclusions, narrower terms) included in the entity\r\nas well as from the foundation entities under the linearization shore line. The IndexTerm property includes \r\nall of the index terms of a linearization entity in one place.",
+            "nullable": true
+          },
+          "inclusion": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of inclusions for this entity",
+            "nullable": true
+          },
+          "exclusion": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of exclusions for this entity",
+            "nullable": true
+          },
+          "browserUrl": {
+            "type": "string",
+            "description": "ICD Browser is a web site that allows users see the ICD in its hierarchical structure at the same time providing search and post-coordination features.\r\nBrowser URL property provides a direct link to the classification in the WHO's on-line ICD Browser.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Class representing an ICD-10 Entity"
+      },
+      "ISearchResult": {
+        "type": "object",
+        "properties": {
+          "destinationEntities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ISimpleEntity"
+            },
+            "description": "List of entities that match the search query",
+            "nullable": true,
+            "readOnly": true
+          },
+          "error": {
+            "type": "boolean",
+            "description": "Returns true if an error is occurred during the search",
+            "readOnly": true
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Error message if there was an error",
+            "nullable": true,
+            "readOnly": true
+          },
+          "resultChopped": {
+            "type": "boolean",
+            "description": "If the search matches too many results, then the result is chopped",
+            "readOnly": true
+          },
+          "wordSuggestionsChopped": {
+            "type": "boolean",
+            "description": "Shows if the word suggestion list is chopped as a result of too many matching words.",
+            "readOnly": true
+          },
+          "guessType": {
+            "$ref": "#/components/schemas/GuessTypeEnum"
+          },
+          "uniqueSearchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "words": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GuessWord"
+            },
+            "description": "List of word suggestions if the search had includeKeywordResult parameter set to true",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents the search result. The search result is organized by ICD entities and in each entity we provide matching property values"
+      },
+      "ISimpleEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "URI of the Entity",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the Entity. The matched part of the title has a special markup for highlighting. \r\nFor example when searched for the cholera the title Vibrio cholera will be like Vibrio <em class=\"found\">cholera</em>",
+            "nullable": true
+          },
+          "stemId": {
+            "type": "string",
+            "description": "If the search result is composed of multiple URIs (i.e. postcoordinated result), Stem Id contains the URI of the stem code\r\nThis field contains the same information as Id in foundation search results",
+            "nullable": true
+          },
+          "isLeaf": {
+            "type": "boolean",
+            "description": "Shows whether the entity is a leaf node (i.e. does not have any children)"
+          },
+          "postcoordinationAvailability": {
+            "$ref": "#/components/schemas/PostcoordinationAvailabilityEnum"
+          },
+          "hasCodingNote": {
+            "type": "boolean",
+            "description": "Shows whether there is a coding note attached to the item"
+          },
+          "hasMaternalChapterLink": {
+            "type": "boolean",
+            "description": "Shows whether the entity has maternal chapter link"
+          },
+          "hasPerinatalChapterLink": {
+            "type": "boolean"
+          },
+          "matchingPVs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ISimplePropertyValue"
+            },
+            "description": "List of property values that match the search string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "propertiesTruncated": {
+            "type": "boolean",
+            "description": "Shows if the list of matching property values is truncated as a result of too many maching property values",
+            "readOnly": true
+          },
+          "isResidualOther": {
+            "type": "boolean",
+            "description": "Shows if this entity is an other specified residual category. (Not applicable for foundation search )",
+            "readOnly": true
+          },
+          "isResidualUnspecified": {
+            "type": "boolean",
+            "description": "Shows if this entity is an unspecified residual category. (Not applicable for foundation search )",
+            "readOnly": true
+          },
+          "chapter": {
+            "type": "string",
+            "description": "The chapter code for the entity",
+            "nullable": true,
+            "readOnly": true
+          },
+          "theCode": {
+            "type": "string",
+            "description": "The code for the entity (Not applicable for foundation )",
+            "nullable": true,
+            "readOnly": true
+          },
+          "score": {
+            "type": "number",
+            "description": "Shows how good is the search result. Higher numbers are better matches. There is no other meaning to this value than its relative value",
+            "format": "double",
+            "readOnly": true
+          },
+          "titleIsASearchResult": {
+            "type": "boolean",
+            "description": "Shows whether the title of the entity is among the search results",
+            "readOnly": true
+          },
+          "titleIsTopScore": {
+            "type": "boolean",
+            "description": "Shows whether the title is the top scored search result",
+            "readOnly": true
+          },
+          "entityType": {
+            "$ref": "#/components/schemas/EntityTypeEnum"
+          },
+          "important": {
+            "type": "boolean",
+            "description": "Identifies a very good match. The result matches all words from the search query.",
+            "readOnly": true
+          },
+          "descendants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ISimpleEntity"
+            },
+            "description": "Used when the search result is not represented as flat list but rather organized according to ICD hierarchy",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "SimpleEntity class represents a single ICD Entity in a search result"
+      },
+      "ISimplePropertyValue": {
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "description": "Id of the property",
+            "nullable": true,
+            "readOnly": true
+          },
+          "label": {
+            "type": "string",
+            "description": "Label that matches the search query. The matched part of the label has a special markup for highlighting. \r\nFor example when searched for the cholera the Vibrio cholera will be like Vibrio <em class=\"found\">cholera</em>",
+            "nullable": true,
+            "readOnly": true
+          },
+          "score": {
+            "type": "number",
+            "description": "Score of the match for this particular property value",
+            "format": "double",
+            "readOnly": true
+          },
+          "important": {
+            "type": "boolean",
+            "description": "Identifies a very good match. The result matches all words from the search query.",
+            "readOnly": true
+          },
+          "foundationUri": {
+            "type": "string",
+            "description": "Only used when searching a linearization\r\nThe foundation URI in which the property value is located.\r\nThis is filled in only during a linearization search when this property value is coming from an under shoreline entity.",
+            "nullable": true
+          },
+          "propertyValueType": {
+            "$ref": "#/components/schemas/PropertyValueTypeEnum"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents PropertyValues returned in the search result"
+      },
+      "LanguageSpecificText": {
+        "type": "object",
+        "properties": {
+          "@language": {
+            "type": "string",
+            "description": "Language code for the string",
+            "nullable": true
+          },
+          "@value": {
+            "type": "string",
+            "description": "Label in the given language",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Language specific text as used in JSON-LD"
+      },
+      "LinearizationEntity": {
+        "type": "object",
+        "properties": {
+          "@context": {
+            "type": "string",
+            "description": "JSON-LD Context for the endpoint",
+            "nullable": true
+          },
+          "@id": {
+            "type": "string",
+            "description": "unique id for this linearization entity (URI)",
+            "nullable": true
+          },
+          "title": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "longDefinition": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "fullySpecifiedName": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "diagnosticCriteria": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "source": {
+            "type": "string",
+            "description": "URI of the foundation entity that this entity is derived from",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "description": "Code for the ICD-11 category",
+            "nullable": true
+          },
+          "codingNote": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "blockId": {
+            "type": "string",
+            "description": "Block id for the block (only applicable to the blocks (groupings). e.g. BlockL2-1A0",
+            "nullable": true
+          },
+          "codeRange": {
+            "type": "string",
+            "description": "Code range for the block (only applicable to the blocks (groupings) e.g. 1A00-1A0Z",
+            "nullable": true
+          },
+          "classKind": {
+            "type": "string",
+            "description": "Class kind for the category. It could be one of the following\r\n- chapter : if the entity is a chapter. (i.e. at the top level of the classification\r\n- block : higher level entity which don't have codes\r\n- category : An ICD entity that bears a code\r\n- window : A special type of grouping which don;t have children underneath but just foundationChildElsewhere",
+            "nullable": true
+          },
+          "child": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of URIs for the child entities",
+            "nullable": true
+          },
+          "parent": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of URIs for the parent entity",
+            "nullable": true
+          },
+          "ancestor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of ancestors. Provided only with include=ancestor",
+            "nullable": true
+          },
+          "descendant": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of descendants. Provided only with include=descendant",
+            "nullable": true
+          },
+          "foundationChildElsewhere": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "ICD-11 Foundation allows multiple parenting which means a category could be located in more than place in \r\nthe foundation component. However, this is not possible for ICD-11 linearizations such as in ICD-11 MMS \r\nin which a category must be located at a single location. When looking at a linearization entity, this \r\nproperty would list the foundation children that are not children in the linearization.",
+            "nullable": true
+          },
+          "indexTerm": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "ICD-11 Index terms are generated from the terms (titles, inclusions, narrower terms) included in the entity\r\nas well as from the foundation entities under the linearization shore line. The IndexTerm property includes \r\nall of the index terms of a linearization entity in one place.",
+            "nullable": true
+          },
+          "inclusion": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of inclusions for this entity",
+            "nullable": true
+          },
+          "exclusion": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            },
+            "description": "List of exclusions for this entity",
+            "nullable": true
+          },
+          "postcoordinationScale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostcoordinationScaleInfo"
+            },
+            "description": "Contains information on which axes allows or requires postcoordination for an entity \r\ntogether with the value set that could be used for the postcoordination",
+            "nullable": true
+          },
+          "browserUrl": {
+            "type": "string",
+            "description": "ICD Browser is a web site that allows users see the ICD in its hierarchical structure at the same time providing search and post-coordination features.\r\nBrowser URL property provides a direct link to the classification in the WHO's on-line ICD Browser.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Class representing a linearization entity such as a category in the MMS."
+      },
+      "MultiVersion": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "latestRelease": {
+            "type": "string",
+            "description": "Latest release available for this linearization",
+            "nullable": true
+          },
+          "release": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of available releases for this linearization",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Class representing available versions of a given classification or classification entity\r\nThis is used when the request is made without a relase id (or minor version)"
+      },
+      "PostcoordinationAvailabilityEnum": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "PostcoordinationScaleInfo": {
+        "type": "object",
+        "properties": {
+          "axisName": {
+            "type": "string",
+            "description": "postcoordination axis name (a URI that uniquely identifies the axis)",
+            "nullable": true
+          },
+          "requiredPostcoordination": {
+            "type": "string",
+            "description": "If the post-coordination is required or just allowed. \"true\" means it is a required postcoordination",
+            "nullable": true
+          },
+          "allowMultipleValues": {
+            "type": "string",
+            "description": "Shows the behaviour of the postcoordination\r\n- 'AllowAlways' means the user could post-coordinate multiple times using this axis.\r\n- 'NotAllowed' means the user only post-coordinate once using this axis\r\n- 'AllowedExceptFromSameBlock' means multiple values are allowed only if they are coming from different blocks within the value set",
+            "nullable": true
+          },
+          "scaleEntity": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of allowed values during postcoordination. \r\nNote that these are hierarchical starting points of the allowed value set. i.e. any descendant of the entities provided under the \r\n`scaleEntity` property can be used during postcoordination.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "This class contains information on which axes allow or require postcoordination for an entity \r\ntogether with the valueset that could be used for the postcoordination"
+      },
+      "PropertyValueTypeEnum": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "description": "(0) Real:                                An index info from a linearization entity <br />\r\n(1) UnderShoreLine:                      An index entity from an entity under the shoreline<br />\r\n(2) UnderShoreLineLogicallyDefined:      An index entity from an entity under the shoreline \r\n                                                       and has a logical definition<br />\r\n(3) PostCoordinationCombination:         Virtual index entity created by following post-coordination\r\n                                                       combinations",
+        "format": "int32"
+      },
+      "Term": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "foundationReference": {
+            "type": "string",
+            "description": "In some cases such as in exclusions or index terms, the term itself could be coming from another entity in the classification\r\nIn these cases foundationReference holds the foundation URI for that entity\r\nIndex terms generated from foundation entities that are not located in the linearization have this reference",
+            "nullable": true
+          },
+          "linearizationReference": {
+            "type": "string",
+            "description": "In some cases such as in exclusions or index terms, the term itself could be coming from another entity in the classification\r\nIn these cases linearizationReference holds the linearization (or release) URI for that entity",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Class representing a term with language specific label and optional cross references"
+      },
+      "TopLevel": {
+        "type": "object",
+        "properties": {
+          "@context": {
+            "type": "string",
+            "description": "JSON-LD Context for the endpoint",
+            "nullable": true
+          },
+          "@id": {
+            "type": "string",
+            "description": "unique id for the classification",
+            "nullable": true
+          },
+          "title": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/LanguageSpecificText"
+          },
+          "child": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of top level entities",
+            "nullable": true
+          },
+          "releaseDate": {
+            "type": "string",
+            "description": "Release date",
+            "nullable": true
+          },
+          "releaseId": {
+            "type": "string",
+            "description": "Release identifier for this particular release of the classification",
+            "nullable": true
+          },
+          "browserUrl": {
+            "type": "string",
+            "description": "ICD Browser is a web site that allows users see the ICD in its hierarchical structure at the same time providing search and post-coordination features.\r\nBrowser URL property provides a direct link to the classification in the WHO's on-line ICD Browser.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Class representing top level foundation or linearization"
+      },
+      "UnderlyingCauseOfDeath": {
+        "type": "object",
+        "properties": {
+          "stemCode": {
+            "type": "string",
+            "description": "Stem code for the computed underlying cause of death",
+            "nullable": true
+          },
+          "stemURI": {
+            "type": "string",
+            "description": "URI for the stem code of the computed underlying cause of death",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "description": "Code for underlying cause of death. May include postcoordination combinations",
+            "nullable": true
+          },
+          "uri": {
+            "type": "string",
+            "description": "URI for underlying cause of death. May include postcoordination combinations",
+            "nullable": true
+          },
+          "report": {
+            "type": "string",
+            "description": "Output report prepared during the computation of the underlying cause of death",
+            "nullable": true
+          },
+          "reject": {
+            "type": "boolean",
+            "description": "Whether the underlying cause of death was rejected due to an error"
+          },
+          "error": {
+            "type": "string",
+            "description": "Any errors returned by the doris engine",
+            "nullable": true
+          },
+          "warning": {
+            "type": "string",
+            "description": "Any warnings returned by the doris engine",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://icdaccessmanagement.who.int/connect/token",
+            "scopes": {
+              "icdapi_access": ""
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "oauth2": [
+        "icdapi_access"
+      ]
+    }
+  ]
+}
